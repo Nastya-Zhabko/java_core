@@ -1,4 +1,4 @@
-package com.nastyazhabko.javacore.StreamAPI;
+package com.nastyazhabko.javacore.streamapi;
 
 @FunctionalInterface
 public interface MyCalculator {
