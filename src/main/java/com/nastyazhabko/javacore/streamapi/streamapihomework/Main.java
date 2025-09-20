@@ -1,7 +1,6 @@
 package com.nastyazhabko.javacore.streamapi.streamapihomework;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,7 +64,8 @@ public class Main {
         //Задание 1
         Set<Product> booksWithPriceBiggerThen100 = customers.stream()
                 .flatMap(customer -> customer.getOrders().stream())
-                .flatMap(order -> order.getProducts().stream()).distinct()
+                .flatMap(order -> order.getProducts().stream())
+                .distinct()
                 .filter(product -> product.getCategory().equals("Books") && product.getPrice().compareTo(new BigDecimal("100.00")) >= 0)
                 .collect(Collectors.toSet());
 
@@ -99,7 +99,7 @@ public class Main {
                 .flatMap(customer -> customer.getOrders().stream())
                 .flatMap(order -> order.getProducts().stream())
                 .distinct()
-                .sorted((o1, o2) -> o1.getPrice().compareTo(o2.getPrice()))
+                .sorted(Comparator.comparing(Product::getPrice))
                 .limit(2)
                 .collect(Collectors.toList());
 
@@ -118,6 +118,7 @@ public class Main {
                 .peek(order -> {
                     System.out.println(order.getId());
                 })
+                .distinct()
                 .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.toSet());
 
@@ -182,13 +183,10 @@ public class Main {
 
         //Задание 11
 
-        //по заданию должна быть Map<Long, Integer>, но не поняла, как сделать, если .count() возвращает Long
-
-        Map<Long, Long> countOfProductInOrder = customers.stream()
+        Map<Long, Integer> countOfProductInOrder = customers.stream()
                 .flatMap(customer -> customer.getOrders().stream())
-                .collect(Collectors.toMap(order -> order.getId(), order -> order.getProducts().stream()
-                        .map(Product::getPrice)
-                        .count()));
+                .collect(Collectors.toMap(order -> order.getId(), order -> order.getProducts().size()));
+
 
 
         //Задание 12
@@ -197,14 +195,11 @@ public class Main {
                         .collect(Collectors.toList())));
 
         //Задание 13
-
-        //Тоже не получилось привести BigDecimal к Double
-        Map<Order, BigDecimal> sumOfOrder = customers.stream()
+        Map<Order, Double> sumOfOrder = customers.stream()
                 .flatMap(customer -> customer.getOrders().stream())
                 .collect(Collectors.toMap(order -> order, order -> order.getProducts().stream()
-                        .map(product -> product.getPrice())
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)));
-
+                        .mapToDouble(product -> product.getPrice().doubleValue())
+                        .reduce(0, Double::sum)));
 
         //Задание 14
         Map<String, List<String>> productsByCategory = customers.stream()
@@ -216,13 +211,13 @@ public class Main {
         //Задание 15
 
         //Нормально ли через Optional<Product>? Без Optional не получилось (по заданию надо Map<String, Product>)
-        Map<String, Optional<Product>> maxPriceProductInCategory = customers.stream()
+        Map<String, Product> maxPriceProductInCategory = customers.stream()
                 .flatMap(customer -> customer.getOrders().stream())
                 .flatMap(order -> order.getProducts().stream())
                 .distinct()
-                .collect(Collectors.groupingBy(Product::getCategory, Collectors.maxBy(Comparator.comparing(Product::getPrice))));
-        System.out.println(maxPriceProductInCategory);
-
+                .collect(Collectors.groupingBy(Product::getCategory, Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Product::getPrice)),
+                        productOptional -> productOptional.orElse(null))
+                ));
     }
 
 }
