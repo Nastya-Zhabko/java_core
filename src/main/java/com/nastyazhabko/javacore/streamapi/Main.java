@@ -1,4 +1,4 @@
-package com.nastyazhabko.javacore.StreamAPI;
+package com.nastyazhabko.javacore.streamapi;
 
 public class Main {
     public void testCalculate(MyCalculator calc) {
