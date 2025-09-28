@@ -1,7 +1,7 @@
 package com.nastyazhabko.javacore.multithreading.synchronizationhomework;
 
 public class UnsynchronizedCounter implements SiteVisitCounter {
-    private static int count = 0;
+    private int count = 0;
 
     @Override
     public void incrementVisitCount() {

@@ -1,8 +1,8 @@
 package com.nastyazhabko.javacore.multithreading.synchronizationhomework;
 
 public class SynchronizedBlockCounter implements SiteVisitCounter {
-    private static Integer count = 0;
-    Object monitor = new Object();
+    private Integer count = 0;
+    private Object monitor = new Object();
 
     @Override
     public void incrementVisitCount() {
@@ -19,6 +19,8 @@ public class SynchronizedBlockCounter implements SiteVisitCounter {
 
     @Override
     public int getVisitCount() {
-        return count;
+        synchronized (monitor) {
+            return count;
+        }
     }
 }

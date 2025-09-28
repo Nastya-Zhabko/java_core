@@ -3,7 +3,7 @@ package com.nastyazhabko.javacore.multithreading.synchronizationhomework;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ReentrantLockCounter implements SiteVisitCounter {
-    private static int count = 0;
+    private int count = 0;
     private static final ReentrantLock lock = new ReentrantLock();
 
 

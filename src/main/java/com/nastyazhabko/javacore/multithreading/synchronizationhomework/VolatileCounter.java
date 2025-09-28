@@ -1,7 +1,7 @@
 package com.nastyazhabko.javacore.multithreading.synchronizationhomework;
 
 public class VolatileCounter implements SiteVisitCounter {
-    private static volatile int count = 0;
+    private volatile int count = 0;
 
     @Override
     public void incrementVisitCount() {
