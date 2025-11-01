@@ -60,7 +60,7 @@ SELECT * FROM orders WHERE created_at >= '2025-01-01' AND created_at
 
 
 --Создание индекса по полю created_at таблицы orders
-CREATE INDEX idx_orders_crated_at ON orders (created_at);
+CREATE INDEX idx_orders_created_at ON orders (created_at);
 
 --План выполнения запроса №1
 
