@@ -12,7 +12,10 @@ public class Main {
         }
 
         //Только после завершения всех задач программа не останавливается, не могу понять почему
-        if (dataProcessor.countOfActiveTasks().get() == 0) {
+        while (dataProcessor.countOfActiveTasks().get() > 0) {
+            System.out.println("Активных задач: " + dataProcessor.countOfActiveTasks().get());
+            Thread.sleep(200);
+            System.out.println("Все задачи завершены!");
             dataProcessor.shutdown();
             for (int i = 0; i < 100; i++) {
                 System.out.println(dataProcessor.taskResultByName("task" + i));

@@ -13,13 +13,18 @@ public class CalculateSumTask implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         System.out.println("Задача " + name + " обрабатывается потоком " + Thread.currentThread().getName());
         int sum = 0;
         for (Integer i : list) {
             sum += i;
         }
-        Thread.sleep(200);
+        try {
+            Thread.sleep(200);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return sum;
     }

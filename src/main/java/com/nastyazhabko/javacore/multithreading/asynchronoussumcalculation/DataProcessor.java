@@ -17,51 +17,50 @@ public class DataProcessor {
         executor = Executors.newFixedThreadPool(executorCount);
     }
 
-    public void executeTask(List<Integer> nums) throws ExecutionException, InterruptedException {
+    public void executeTask(List<Integer> nums) {
         activeTaskCounter.incrementAndGet();
         taskCounter.incrementAndGet();
         String taskName = "task" + taskCounter.get();
         CalculateSumTask task = new CalculateSumTask(nums, taskName);
-        CompletableFuture<Integer> future = new CompletableFuture<>();
-
-        executor.execute(() -> {
-            try {
-                future.complete(task.call());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        future.thenAccept(res -> {
-            synchronized (taskResults) {
-                taskResults.put(taskName, res);
-                System.out.println("Вывод:" + taskResults.get(taskName));
-            }
-            future.join();
-            activeTaskCounter.decrementAndGet();
-        });
-    }
-
-    public AtomicInteger countOfActiveTasks() {
-        return activeTaskCounter;
-    }
-
-    public Optional<Integer> taskResultByName(String taskName) {
-        synchronized (taskResults) {
-            return Optional.ofNullable(taskResults.get(taskName));
-        }
-    }
-
-    public void shutdown() {
-        executor.shutdown();
+        Future future = executor.submit(task);
+        Integer result = null;
         try {
-            boolean isTerminated = executor.awaitTermination(10, TimeUnit.MILLISECONDS);
-            if (!isTerminated) {
-                executor.shutdownNow();
-            }
+            result = (Integer) future.get();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         } catch (InterruptedException e) {
-            executor.shutdownNow();
             throw new RuntimeException(e);
         }
+
+        synchronized (taskResults) {
+            taskResults.put(taskName, result);
+            System.out.println("Вывод:" + taskResults.get(taskName));
+        }
+
+        activeTaskCounter.decrementAndGet();
+
+}
+
+public AtomicInteger countOfActiveTasks() {
+    return activeTaskCounter;
+}
+
+public Optional<Integer> taskResultByName(String taskName) {
+    synchronized (taskResults) {
+        return Optional.ofNullable(taskResults.get(taskName));
     }
+}
+
+public void shutdown() {
+    executor.shutdown();
+    try {
+        boolean isTerminated = executor.awaitTermination(10, TimeUnit.SECONDS);
+        if (!isTerminated) {
+            executor.shutdownNow();
+        }
+    } catch (InterruptedException e) {
+        executor.shutdownNow();
+        throw new RuntimeException(e);
+    }
+}
 }
